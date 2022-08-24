@@ -1,7 +1,6 @@
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
@@ -38,10 +37,15 @@ public class Snake {
         while (true) {
 
             int index = 0;
+            int foodCountIndex;
+            int gameSpeed = 100;
+            for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
+                gameSpeed-=20;
+            }
             KeyStroke keyStroke = null;
             do {
                 index++;
-                if (index % 100 == 0) {
+                if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
                         handlePlayer(player, latestKeyStroke, terminal, foodPos);
                     }
