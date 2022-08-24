@@ -47,7 +47,8 @@ public class Snake {
                 index++;
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
-                        handlePlayer(player, latestKeyStroke, terminal, foodPos);
+                        playGame(player, latestKeyStroke, terminal, foodPos);
+                        updateMenu(terminal);
                     }
                 }
                 Thread.sleep(5); // might throw InterruptedException
