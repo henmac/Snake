@@ -1,6 +1,5 @@
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
 
@@ -26,6 +24,7 @@ public class Snake {
         terminal.setCursorVisible(false);
 
         Position playerPos = new Position(20,25);
+        terminal.setForegroundColor(TextColor.ANSI.GREEN);
         terminal.setCursorPosition(playerPos.x, playerPos.y);
         terminal.putCharacter(actorSnake);
 
@@ -53,11 +52,11 @@ public class Snake {
                 index++;
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
-                        playGame(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
+                        playGame(playerPos, latestKeyStroke, terminal);
                         updateMenu(terminal);
                     }
                 }
-                foodMovement(terminal, player, foodPos);
+                foodMovement(terminal, playerPos, foodPos);
                 Thread.sleep(5); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
             } while (keyStroke == null);
@@ -127,7 +126,7 @@ public class Snake {
             foodPos.y = (r.nextInt(3, 24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(actorFood);
-
+            terminal.flush();
             foodCounter++;
 
         }
