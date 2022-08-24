@@ -1,32 +1,42 @@
-import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
 
     static List<Position> oldMoves = new ArrayList<>();
-    static final char food = 'o';
+    static final char actorFood = 'o';
+    static final char actorSnake = '\u2588';
+    static final char actorPoison = '\u2620';
     static Random r = new Random();
     static int foodCounter = 1;
+    static int everyFourth = 2;
 
     public static void main(String[] args) throws Exception {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
 
-        Position player = new Position(13,13);
-        terminal.setForegroundColor(TextColor.ANSI.GREEN);
-        terminal.setCursorPosition(player.x, player.y);
-        terminal.putCharacter('\u2588');
+        Position playerPos = new Position(20,25);
+        terminal.setCursorPosition(playerPos.x, playerPos.y);
+        terminal.putCharacter(actorSnake);
 
-        Position foodPos = new Position(r.nextInt(40), r.nextInt(3,24));
-        terminal.setCursorPosition(foodPos.x, foodPos.y);
-        terminal.putCharacter(food);
+
+        Position foodPos = new Position(15,15);
+        terminal.setCursorPosition(foodPos.getX(), foodPos.getY());
+        terminal.putCharacter(actorFood);
+
+        Position poisonPos = new Position(13,13);
+        terminal.setCursorPosition(poisonPos.x, poisonPos.y);
+        terminal.putCharacter(actorPoison);
 
         KeyStroke latestKeyStroke = null;
 
@@ -43,7 +53,8 @@ public class Snake {
                 index++;
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
-                        playGame(player, latestKeyStroke, terminal);
+                        playGame(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
+                        updateMenu(terminal);
                     }
                 }
                 foodMovement(terminal, player, foodPos);
@@ -86,7 +97,7 @@ public class Snake {
             player.y = 24;
         }
         terminal.setCursorPosition(player.x, player.y);
-        terminal.putCharacter('\u2588');
+        terminal.putCharacter(actorSnake);
 
         for (Position tail : oldMoves) {
             terminal.setCursorPosition(tail.getX(), tail.getY());
@@ -115,9 +126,53 @@ public class Snake {
             foodPos.x = (r.nextInt(40));
             foodPos.y = (r.nextInt(3, 24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
-            terminal.putCharacter(food);
-            terminal.flush();
+            terminal.putCharacter(actorFood);
+
             foodCounter++;
+
+        }
+    }
+
+    public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
+        int lives = 3;
+
+        //generate poison after every 4th food
+        if (foodCounter % everyFourth == 0) {
+            for (int i = 0; i < 2; i++) {
+                poison.x = (r.nextInt(40));
+                poison.y = (r.nextInt(2, 24));
+                terminal.setCursorPosition(poison.x, poison.y);
+                terminal.putCharacter(actorPoison);
+            }
+            everyFourth += 2;
+        }
+//lost of life and generation of a new poison after eating one
+        if (poison.x == player.x && poison.y == player.y) {
+            lives--;
+            poison.x = (r.nextInt(40));
+            poison.y = (r.nextInt(2, 24));
+            terminal.setCursorPosition(poison.x, poison.y);
+            terminal.putCharacter(actorPoison);
+        }
+    }
+
+    private static void updateMenu(Terminal terminal) throws IOException {
+        terminal.setCursorPosition(25, 1);
+
+        String message = "* SNAKE Level 1 Food " + (foodCounter-1) + " Lives 3 *";
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter(message.charAt(i));
+        }
+        terminal.setCursorPosition(25, 0);
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter('*');
+        }
+        terminal.setCursorPosition(25, 2);
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter('*');
         }
     }
 }
