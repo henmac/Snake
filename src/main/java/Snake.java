@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
 
@@ -49,17 +48,26 @@ public class Snake {
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
                         handlePlayer(player, latestKeyStroke, terminal, foodPos);
-                        updateMenu(terminal);
                     }
                 }
                 Thread.sleep(5); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
             } while (keyStroke == null);
+
+            Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
+            if (c == Character.valueOf('q')) {
+                terminal.close();
+                break;
+            } else if (c == Character.valueOf('p')) {
+                terminal.readInput();
+                continue;
+            }
+
             latestKeyStroke = keyStroke;
         }
     }
 
-    private static void handlePlayer (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos) throws Exception {
+    private static void playGame (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
         oldMoves.add(oldPosition);
@@ -70,10 +78,10 @@ public class Snake {
             case ArrowRight -> player.x += 1;
             case ArrowLeft -> player.x -= 1;
         }
-        if (player.x > 80) {
+        if (player.x > 40) {
             player.x = 1;
         } else if (player.x < 1) {
-            player.x = 80;
+            player.x = 40;
         }
         if (player.y > 24) {
             player.y = 2;
@@ -102,13 +110,12 @@ public class Snake {
         // check if player runs into the food
 
         if (foodPos.x == player.x && foodPos.y == player.y) {
-            foodPos.x = (r.nextInt(80));
+            foodPos.x = (r.nextInt(40));
             foodPos.y = (r.nextInt(24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(food);
 
             foodCounter++;
-            terminal.flush();
         }
 
 
