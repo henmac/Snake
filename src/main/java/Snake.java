@@ -23,7 +23,7 @@ public class Snake {
         terminal.setCursorPosition(player.x, player.y);
         terminal.putCharacter('\u2588');
 
-        Position foodPos = new Position(r.nextInt(40), r.nextInt(24));
+        Position foodPos = new Position(r.nextInt(80), r.nextInt(24));
         terminal.setCursorPosition(foodPos.x, foodPos.y);
         terminal.putCharacter(food);
 
