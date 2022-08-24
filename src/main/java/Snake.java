@@ -4,33 +4,34 @@ import com.googlecode.lanterna.terminal.Terminal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
 
     static List<Position> oldMoves = new ArrayList<>();
-    static final char food = 'o';
+    static final char actorFood = 'o';
+    static final char actorSnake = '\u2588';
+    static final char actorPoison = '\u2620';
     static Random r = new Random();
     static int foodCounter = 1;
-
-    private static void setActorPosition(int x, int y, char actor, Terminal terminal) throws Exception {
-        terminal.setCursorPosition(x, y);
-        terminal.putCharacter(actor);
-    }
+    static int everyFourth = 2;
 
     public static void main(String[] args) throws Exception {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
 
-        Position player = new Position(13,13);
-        terminal.setCursorPosition(player.x, player.y);
-        terminal.putCharacter('\u2588');
-        setActorPosition(player.x, player.y, '\u2588', terminal);
+        Position playerPos = new Position(20,25);
+        terminal.setCursorPosition(playerPos.x, playerPos.y);
+        terminal.putCharacter(actorSnake);
 
-        Position foodPos = new Position(r.nextInt(40), r.nextInt(24));
-        terminal.setCursorPosition(foodPos.x, foodPos.y);
-        terminal.putCharacter(food);
+
+        Position foodPos = new Position(15,15);
+        terminal.setCursorPosition(foodPos.getX(), foodPos.getY());
+        terminal.putCharacter(actorFood);
+
+        Position poisonPos = new Position(13,13);
+        terminal.setCursorPosition(poisonPos.x, poisonPos.y);
+        terminal.putCharacter(actorPoison);
 
         KeyStroke latestKeyStroke = null;
 
@@ -47,7 +48,7 @@ public class Snake {
                 index++;
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
-                        handlePlayer(player, latestKeyStroke, terminal, foodPos);
+                        handlePlayer(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
                     }
                 }
                 Thread.sleep(5); // might throw InterruptedException
@@ -57,7 +58,7 @@ public class Snake {
         }
     }
 
-    private static void handlePlayer (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos) throws Exception {
+    private static void handlePlayer (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos, Position poisonPos) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
         oldMoves.add(oldPosition);
@@ -79,8 +80,9 @@ public class Snake {
             player.y = 24;
         }
         terminal.setCursorPosition(player.x, player.y);
-        terminal.putCharacter('\u2588');
+        terminal.putCharacter(actorSnake);
 
+        //dead
         for (Position tail : oldMoves) {
             if (player.x == tail.getX() && player.y == tail.getY()) {
                 terminal.close();
@@ -93,22 +95,50 @@ public class Snake {
             terminal.putCharacter(' ');
             oldMoves.remove(0);
         }
+
         foodMovement(terminal, player, foodPos);
+        poison(player, poisonPos, terminal);
         terminal.flush();
     }
     public static void foodMovement(Terminal terminal, Position player, Position foodPos) throws Exception {
         // check if player runs into the food
 
         if (foodPos.x == player.x && foodPos.y == player.y) {
-            foodPos.x = (r.nextInt(80));
-            foodPos.y = (r.nextInt(24));
+            foodPos.x = (r.nextInt(40));
+            foodPos.y = (r.nextInt(2,24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
-            terminal.putCharacter(food);
+            terminal.putCharacter(actorFood);
 
             foodCounter++;
-            terminal.flush();
+
         }
     }
+
+    public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
+        int lives = 3;
+
+        //generate poison after every 4th food
+        if (foodCounter % everyFourth == 0) {
+            for (int i = 0; i < 2; i++) {
+                poison.x = (r.nextInt(40));
+                poison.y = (r.nextInt(2, 24));
+                terminal.setCursorPosition(poison.x, poison.y);
+                terminal.putCharacter(actorPoison);
+            }
+            everyFourth += 2;
+        }
+        //lost of life and generation of a new poison after eating one
+        if (poison.x == player.x && poison.y == player.y) {
+            lives--;
+            poison.x = (r.nextInt(40));
+            poison.y = (r.nextInt(2, 24));
+            terminal.setCursorPosition(poison.x, poison.y);
+            terminal.putCharacter(actorPoison);
+        }
+
+
+    }
+
 }
 
 class Position {
