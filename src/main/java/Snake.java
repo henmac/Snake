@@ -1,6 +1,13 @@
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
@@ -42,6 +49,7 @@ public class Snake {
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
                         handlePlayer(player, latestKeyStroke, terminal, foodPos);
+                        updateMenu(terminal);
                     }
                 }
                 Thread.sleep(5); // might throw InterruptedException
@@ -102,6 +110,31 @@ public class Snake {
             foodCounter++;
             terminal.flush();
         }
+
+
+
+
+
+    }
+
+    private static void updateMenu(Terminal terminal) throws IOException {
+        terminal.setCursorPosition(25, 1);
+
+        String message = "* SNAKE Level 1 Food " + foodCounter + " Lives 3 *";
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter(message.charAt(i));
+        }
+        terminal.setCursorPosition(25, 0);
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter('*');
+        }
+        terminal.setCursorPosition(25, 2);
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter('*');
+        }
     }
 }
 
@@ -121,4 +154,5 @@ class Position {
     public int getY() {
         return y;
     }
+
 }
