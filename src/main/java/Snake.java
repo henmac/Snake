@@ -14,6 +14,11 @@ public class Snake {
     static Random r = new Random();
     static int foodCounter = 1;
 
+    private static void setActorPosition(int x, int y, char actor, Terminal terminal) throws Exception {
+        terminal.setCursorPosition(x, y);
+        terminal.putCharacter(actor);
+    }
+
     public static void main(String[] args) throws Exception {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
@@ -22,6 +27,7 @@ public class Snake {
         Position player = new Position(13,13);
         terminal.setCursorPosition(player.x, player.y);
         terminal.putCharacter('\u2588');
+        setActorPosition(player.x, player.y, '\u2588', terminal);
 
         Position foodPos = new Position(r.nextInt(40), r.nextInt(24));
         terminal.setCursorPosition(foodPos.x, foodPos.y);
