@@ -57,7 +57,7 @@ public class Snake {
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
                         playGame(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
-                        updateMenu(terminal)
+                        updateMenu(terminal);
                     }
                 }
                 Thread.sleep(5); // might throw InterruptedException
@@ -125,7 +125,7 @@ public class Snake {
             foodPos.x = (r.nextInt(40));
             foodPos.y = (r.nextInt(2,24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
-            terminal.putCharacter(food);
+            terminal.putCharacter(actorFood);
 
             foodCounter++;
 
