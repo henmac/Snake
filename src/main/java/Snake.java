@@ -1,9 +1,17 @@
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
 
@@ -48,17 +56,28 @@ public class Snake {
                 index++;
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
-                        handlePlayer(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
+                        playGame(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
+                        updateMenu(terminal)
                     }
                 }
                 Thread.sleep(5); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
             } while (keyStroke == null);
+
+            Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
+            if (c == Character.valueOf('q')) {
+                terminal.close();
+                break;
+            } else if (c == Character.valueOf('p')) {
+                terminal.readInput();
+                continue;
+            }
+
             latestKeyStroke = keyStroke;
         }
     }
 
-    private static void handlePlayer (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos, Position poisonPos) throws Exception {
+    private static void playGame (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos, Position poisonPos) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
         oldMoves.add(oldPosition);
@@ -69,10 +88,10 @@ public class Snake {
             case ArrowRight -> player.x += 1;
             case ArrowLeft -> player.x -= 1;
         }
-        if (player.x > 80) {
+        if (player.x > 40) {
             player.x = 1;
         } else if (player.x < 1) {
-            player.x = 80;
+            player.x = 40;
         }
         if (player.y > 24) {
             player.y = 2;
@@ -95,7 +114,6 @@ public class Snake {
             terminal.putCharacter(' ');
             oldMoves.remove(0);
         }
-
         foodMovement(terminal, player, foodPos);
         poison(player, poisonPos, terminal);
         terminal.flush();
@@ -107,7 +125,7 @@ public class Snake {
             foodPos.x = (r.nextInt(40));
             foodPos.y = (r.nextInt(2,24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
-            terminal.putCharacter(actorFood);
+            terminal.putCharacter(food);
 
             foodCounter++;
 
@@ -127,7 +145,7 @@ public class Snake {
             }
             everyFourth += 2;
         }
-        //lost of life and generation of a new poison after eating one
+//lost of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             lives--;
             poison.x = (r.nextInt(40));
@@ -135,10 +153,27 @@ public class Snake {
             terminal.setCursorPosition(poison.x, poison.y);
             terminal.putCharacter(actorPoison);
         }
-
-
     }
 
+    private static void updateMenu(Terminal terminal) throws IOException {
+        terminal.setCursorPosition(25, 1);
+
+        String message = "* SNAKE Level 1 Food " + (foodCounter-1) + " Lives 3 *";
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter(message.charAt(i));
+        }
+        terminal.setCursorPosition(25, 0);
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter('*');
+        }
+        terminal.setCursorPosition(25, 2);
+        for (int i = 0; i < message.length(); i++) {
+
+            terminal.putCharacter('*');
+        }
+    }
 }
 
 class Position {
