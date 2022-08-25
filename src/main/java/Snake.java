@@ -47,7 +47,7 @@ public class Snake {
 
             int index = 0;
             int foodCountIndex;
-            int gameSpeed = 200;
+            int gameSpeed = 150;
             for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
                 gameSpeed-= (gameSpeed/10);
                 if (gameSpeed <= 0) {
@@ -113,8 +113,7 @@ public class Snake {
 
         for (Position tail : oldMoves) {
             if (player.x == tail.getX() && player.y == tail.getY()) {
-                terminal.close();
-                break;
+                loseLife(terminal);
             }
         }
 
@@ -156,7 +155,6 @@ public class Snake {
 //lost of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             loseLife(terminal);
-            terminal.bell();
             poison.x = (r.nextInt(40));
             poison.y = (r.nextInt(2, 24));
             terminal.setCursorPosition(poison.x, poison.y);
@@ -167,7 +165,7 @@ public class Snake {
     private static void updateMenu(Terminal terminal) throws IOException {
         terminal.setCursorPosition(25, 1);
 
-        String message = "* SNAKE Level 1 Food " + (foodCounter - 1) + " Lives "+lifeCounter+ "*";
+        String message = "* SNAKE Level 1 Food " + (foodCounter - 1) + " Lives "+lifeCounter+ " *";
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
@@ -187,6 +185,7 @@ public class Snake {
 
     public static void loseLife(Terminal terminal) throws Exception {
         lifeCounter--;
+        terminal.bell();
 
         if (lifeCounter == 0) {
 
@@ -205,7 +204,9 @@ public class Snake {
 
             updateMenu(terminal);
             terminal.flush();
-            terminal.readInput();
+            while (true) {
+                terminal.readInput();
+            }
         }
 
     }
