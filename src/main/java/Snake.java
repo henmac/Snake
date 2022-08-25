@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Snake {
-
     static List<Position> oldMoves = new ArrayList<>();
     static boolean play = true;
     static final char actorFood = 'o';
@@ -73,7 +72,7 @@ public class Snake {
             Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
             if (c == Character.valueOf('q')) {
                 terminal.close();
-                break;
+                play = false;
             } else if (c == Character.valueOf('p')) {
                 terminal.readInput();
                 continue;
@@ -217,7 +216,6 @@ public class Snake {
                 }
             }
         }
-
     }
 }
 class Position {
