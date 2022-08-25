@@ -156,7 +156,6 @@ public class Snake {
 //lost of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             loseLife(terminal);
-            terminal.bell();
             poison.x = (r.nextInt(79));
             poison.y = (r.nextInt(2, 24));
             terminal.setCursorPosition(poison.x, poison.y);
