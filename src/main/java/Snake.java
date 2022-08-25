@@ -11,12 +11,14 @@ import java.util.Random;
 public class Snake {
 
     static List<Position> oldMoves = new ArrayList<>();
+    static List<Position> allPoisonPos = new ArrayList<>();
     static final char actorFood = 'o';
     static final char actorSnake = '\u2588';
     static final char actorPoison = '\u2620';
+    //ev. radera
     static Random r = new Random();
     static int foodCounter = 1;
-    static int everyFourth = 2;
+    static int everySecond = 2;
 
     public static void main(String[] args) throws Exception {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
@@ -36,8 +38,11 @@ public class Snake {
         terminal.putCharacter(actorFood);
 
         Position poisonPos = new Position(13,13);
+        allPoisonPos.add(poisonPos);
         terminal.setCursorPosition(poisonPos.x, poisonPos.y);
         terminal.putCharacter(actorPoison);
+
+
 
         KeyStroke latestKeyStroke = null;
 
@@ -139,26 +144,43 @@ public class Snake {
     }
 
     public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
+        //remove
         int lives = 3;
 
         //generate poison after every 4th food
-        if (foodCounter % everyFourth == 0) {
+        if (foodCounter % everySecond == 0) {
             for (int i = 0; i < 2; i++) {
-                poison.x = (r.nextInt(40));
-                poison.y = (r.nextInt(2, 24));
-                terminal.setCursorPosition(poison.x, poison.y);
+                Position poisonPos = new Position(r.nextInt(40), r.nextInt(2,24));
+                allPoisonPos.add(poisonPos);
+
+                terminal.setCursorPosition(poisonPos.x, poisonPos.y);
                 terminal.putCharacter(actorPoison);
             }
-            everyFourth += 2;
+            everySecond += 2;
         }
 //loss of life and generation of a new poison after eating one
-        if (poison.x == player.x && poison.y == player.y) {
-            lives--;
-            terminal.bell();
-            poison.x = (r.nextInt(40));
-            poison.y = (r.nextInt(2, 24));
-            terminal.setCursorPosition(poison.x, poison.y);
-            terminal.putCharacter(actorPoison);
+        Position removePoison = null;
+        Position addPoison = null;
+
+        for (Position poisonBite : allPoisonPos) {
+            if (poisonBite != null && player.x == poisonBite.getX() && player.y == poisonBite.getY()) {
+                lives--;
+                terminal.bell();
+                removePoison = poisonBite;
+
+                Position poisonPos1 = new Position(r.nextInt(40), r.nextInt(2,24));
+                addPoison = poisonPos1;
+
+                terminal.setCursorPosition(poisonPos1.x, poisonPos1.y);
+                terminal.putCharacter(actorPoison);
+            }
+        }
+
+        if(removePoison != null) {
+            allPoisonPos.add(addPoison);
+        }
+        if(removePoison != null) {
+            allPoisonPos.remove(removePoison);
         }
     }
 
