@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Snake {
-
     static List<Position> oldMoves = new ArrayList<>();
+    static boolean play = true;
+
     static final char actorFood = 'o';
     static final char actorSnake = '\u2588';
     static final char actorPoison = '\u2620';
@@ -43,13 +44,13 @@ public class Snake {
 
         KeyStroke latestKeyStroke = null;
 
-        while (true) {
+        while (play) {
 
             int index = 0;
             int foodCountIndex;
             int gameSpeed = 150;
-            for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++) {
-                gameSpeed -= (gameSpeed / 10);
+            for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
+                gameSpeed-= (gameSpeed/10);
                 if (gameSpeed <= 0) {
                     gameSpeed = 1;
                 }
@@ -72,7 +73,7 @@ public class Snake {
             Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
             if (c == Character.valueOf('q')) {
                 terminal.close();
-                break;
+                play = false;
             } else if (c == Character.valueOf('p')) {
                 terminal.readInput();
                 continue;
@@ -113,8 +114,7 @@ public class Snake {
 
         for (Position tail : oldMoves) {
             if (player.x == tail.getX() && player.y == tail.getY()) {
-                terminal.close();
-                break;
+                loseLife(terminal);
             }
         }
 
@@ -187,6 +187,7 @@ public class Snake {
 
     public static void loseLife(Terminal terminal) throws Exception {
         lifeCounter--;
+        terminal.bell();
 
         if (lifeCounter == 0) {
 
@@ -205,9 +206,18 @@ public class Snake {
 
             updateMenu(terminal);
             terminal.flush();
-            terminal.readInput();
-        }
+            while (true) {
+                KeyStroke keyStroke = terminal.readInput();
+                Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
+                if (c == Character.valueOf('y')) {
 
+                } else if (c == Character.valueOf('n')) {
+                    terminal.close();
+                    play = false;
+                    break;
+                }
+            }
+        }
     }
 }
 class Position {
