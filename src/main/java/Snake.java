@@ -145,7 +145,7 @@ public class Snake {
             }
             everyFourth += 2;
         }
-//lost of life and generation of a new poison after eating one
+//loss of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             lives--;
             poison.x = (r.nextInt(40));
