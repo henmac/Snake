@@ -93,10 +93,10 @@ public class Snake {
             case ArrowRight -> player.x += 1;
             case ArrowLeft -> player.x -= 1;
         }
-        if (player.x > 40) {
+        if (player.x > 79) {
             player.x = 0;
         } else if (player.x < 0) {
-            player.x = 40;
+            player.x = 79;
         }
         if (player.y > 24) {
             player.y = 3;
@@ -130,7 +130,7 @@ public class Snake {
         // check if player runs into the food
 
         if (foodPos.x == player.x && foodPos.y == player.y) {
-            foodPos.x = (r.nextInt(40));
+            foodPos.x = (r.nextInt(79));
             foodPos.y = (r.nextInt(3, 24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(actorFood);
@@ -146,7 +146,7 @@ public class Snake {
         //generate poison after every 4th food
         if (foodCounter % everyFourth == 0) {
             for (int i = 0; i < 2; i++) {
-                poison.x = (r.nextInt(40));
+                poison.x = (r.nextInt(79));
                 poison.y = (r.nextInt(2, 24));
                 terminal.setCursorPosition(poison.x, poison.y);
                 terminal.putCharacter(actorPoison);
@@ -157,7 +157,7 @@ public class Snake {
         if (poison.x == player.x && poison.y == player.y) {
             loseLife(terminal);
             terminal.bell();
-            poison.x = (r.nextInt(40));
+            poison.x = (r.nextInt(79));
             poison.y = (r.nextInt(2, 24));
             terminal.setCursorPosition(poison.x, poison.y);
             terminal.putCharacter(actorPoison);
@@ -165,19 +165,19 @@ public class Snake {
     }
 
     private static void updateMenu(Terminal terminal) throws IOException {
-        terminal.setCursorPosition(25, 1);
+        terminal.setCursorPosition(28, 1);
 
-        String message = "* SNAKE Level 1 Food " + (foodCounter - 1) + " Lives "+lifeCounter+ "*";
+        String message = "* SNAKE Food " + (foodCounter - 1) + " Lives "+lifeCounter+ " *";
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
         }
-        terminal.setCursorPosition(25, 0);
+        terminal.setCursorPosition(28, 0);
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter('*');
         }
-        terminal.setCursorPosition(25, 2);
+        terminal.setCursorPosition(28, 2);
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter('*');
