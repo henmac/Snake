@@ -22,9 +22,11 @@ public class Snake {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
+        terminal.setForegroundColor(TextColor.ANSI.GREEN);
+
+        updateMenu(terminal);
 
         Position playerPos = new Position(20,25);
-        terminal.setForegroundColor(TextColor.ANSI.GREEN);
         terminal.setCursorPosition(playerPos.x, playerPos.y);
         terminal.putCharacter(actorSnake);
 
@@ -43,9 +45,12 @@ public class Snake {
 
             int index = 0;
             int foodCountIndex;
-            int gameSpeed = 100;
+            int gameSpeed = 200;
             for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
-                gameSpeed-=20;
+                gameSpeed-= (gameSpeed/10);
+                if (gameSpeed <= 0) {
+                    gameSpeed = 1;
+                }
             }
             KeyStroke keyStroke = null;
             do {
@@ -57,7 +62,8 @@ public class Snake {
                     }
                 }
                 foodMovement(terminal, playerPos, foodPos);
-                Thread.sleep(5); // might throw InterruptedException
+                poison(playerPos, poisonPos, terminal);
+                Thread.sleep(3); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
             } while (keyStroke == null);
 
@@ -148,6 +154,7 @@ public class Snake {
 //lost of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             lives--;
+            terminal.bell();
             poison.x = (r.nextInt(40));
             poison.y = (r.nextInt(2, 24));
             terminal.setCursorPosition(poison.x, poison.y);
