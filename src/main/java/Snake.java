@@ -47,7 +47,7 @@ public class Snake {
             int foodCountIndex;
             int gameSpeed = 200;
             for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
-                gameSpeed-= (gameSpeed/10);
+                gameSpeed -= (gameSpeed/10);
                 if (gameSpeed <= 0) {
                     gameSpeed = 1;
                 }
