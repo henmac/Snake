@@ -1,9 +1,5 @@
-import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
@@ -11,7 +7,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
 
@@ -27,6 +22,9 @@ public class Snake {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
+        terminal.setForegroundColor(TextColor.ANSI.GREEN);
+
+        updateMenu(terminal);
 
         Position playerPos = new Position(20,25);
         terminal.setCursorPosition(playerPos.x, playerPos.y);
@@ -47,20 +45,25 @@ public class Snake {
 
             int index = 0;
             int foodCountIndex;
-            int gameSpeed = 100;
+            int gameSpeed = 200;
             for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
-                gameSpeed-=20;
+                gameSpeed-= (gameSpeed/10);
+                if (gameSpeed <= 0) {
+                    gameSpeed = 1;
+                }
             }
             KeyStroke keyStroke = null;
             do {
                 index++;
                 if (index % gameSpeed == 0) {
                     if (latestKeyStroke != null) {
-                        playGame(playerPos, latestKeyStroke, terminal, foodPos, poisonPos);
+                        playGame(playerPos, latestKeyStroke, terminal);
                         updateMenu(terminal);
                     }
                 }
-                Thread.sleep(5); // might throw InterruptedException
+                foodMovement(terminal, playerPos, foodPos);
+                poison(playerPos, poisonPos, terminal);
+                Thread.sleep(3); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
             } while (keyStroke == null);
 
@@ -77,7 +80,7 @@ public class Snake {
         }
     }
 
-    private static void playGame (Position player, KeyStroke keyStroke, Terminal terminal, Position foodPos, Position poisonPos) throws Exception {
+    private static void playGame (Position player, KeyStroke keyStroke, Terminal terminal) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
         oldMoves.add(oldPosition);
@@ -89,19 +92,23 @@ public class Snake {
             case ArrowLeft -> player.x -= 1;
         }
         if (player.x > 40) {
-            player.x = 1;
-        } else if (player.x < 1) {
+            player.x = 0;
+        } else if (player.x < 0) {
             player.x = 40;
         }
         if (player.y > 24) {
-            player.y = 2;
-        } else if (player.y < 2) {
+            player.y = 3;
+        } else if (player.y < 3) {
             player.y = 24;
         }
         terminal.setCursorPosition(player.x, player.y);
         terminal.putCharacter(actorSnake);
 
-        //dead
+        for (Position tail : oldMoves) {
+            terminal.setCursorPosition(tail.getX(), tail.getY());
+            terminal.putCharacter('\u2592');
+        }
+
         for (Position tail : oldMoves) {
             if (player.x == tail.getX() && player.y == tail.getY()) {
                 terminal.close();
@@ -114,8 +121,7 @@ public class Snake {
             terminal.putCharacter(' ');
             oldMoves.remove(0);
         }
-        foodMovement(terminal, player, foodPos);
-        poison(player, poisonPos, terminal);
+
         terminal.flush();
     }
     public static void foodMovement(Terminal terminal, Position player, Position foodPos) throws Exception {
@@ -123,10 +129,10 @@ public class Snake {
 
         if (foodPos.x == player.x && foodPos.y == player.y) {
             foodPos.x = (r.nextInt(40));
-            foodPos.y = (r.nextInt(2,24));
+            foodPos.y = (r.nextInt(3, 24));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(actorFood);
-
+            terminal.flush();
             foodCounter++;
 
         }
@@ -148,6 +154,7 @@ public class Snake {
 //loss of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             lives--;
+            terminal.bell();
             poison.x = (r.nextInt(40));
             poison.y = (r.nextInt(2, 24));
             terminal.setCursorPosition(poison.x, poison.y);
