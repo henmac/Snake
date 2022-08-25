@@ -18,6 +18,8 @@ public class Snake {
     static int foodCounter = 1;
     static int everyFourth = 2;
 
+    static int lifeCounter = 3;
+
     public static void main(String[] args) throws Exception {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
@@ -26,16 +28,16 @@ public class Snake {
 
         updateMenu(terminal);
 
-        Position playerPos = new Position(20,25);
+        Position playerPos = new Position(20, 25);
         terminal.setCursorPosition(playerPos.x, playerPos.y);
         terminal.putCharacter(actorSnake);
 
 
-        Position foodPos = new Position(15,15);
+        Position foodPos = new Position(15, 15);
         terminal.setCursorPosition(foodPos.getX(), foodPos.getY());
         terminal.putCharacter(actorFood);
 
-        Position poisonPos = new Position(13,13);
+        Position poisonPos = new Position(13, 13);
         terminal.setCursorPosition(poisonPos.x, poisonPos.y);
         terminal.putCharacter(actorPoison);
 
@@ -45,9 +47,9 @@ public class Snake {
 
             int index = 0;
             int foodCountIndex;
-            int gameSpeed = 200;
-            for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
-                gameSpeed-= (gameSpeed/10);
+            int gameSpeed = 150;
+            for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++) {
+                gameSpeed -= (gameSpeed / 10);
                 if (gameSpeed <= 0) {
                     gameSpeed = 1;
                 }
@@ -80,7 +82,7 @@ public class Snake {
         }
     }
 
-    private static void playGame (Position player, KeyStroke keyStroke, Terminal terminal) throws Exception {
+    private static void playGame(Position player, KeyStroke keyStroke, Terminal terminal) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
         oldMoves.add(oldPosition);
@@ -139,7 +141,7 @@ public class Snake {
     }
 
     public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
-        int lives = 3;
+
 
         //generate poison after every 4th food
         if (foodCounter % everyFourth == 0) {
@@ -153,7 +155,7 @@ public class Snake {
         }
 //lost of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
-            lives--;
+            loseLife(terminal);
             terminal.bell();
             poison.x = (r.nextInt(40));
             poison.y = (r.nextInt(2, 24));
@@ -164,9 +166,8 @@ public class Snake {
 
     private static void updateMenu(Terminal terminal) throws IOException {
         terminal.setCursorPosition(25, 1);
-        char heart = '\u2665';
 
-        String message = "* SNAKE Lives " + heart + heart + " Food " + (foodCounter-1) + " *";
+        String message = "* SNAKE Level 1 Food " + (foodCounter - 1) + " Lives "+lifeCounter+ "*";
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
@@ -181,9 +182,34 @@ public class Snake {
 
             terminal.putCharacter('*');
         }
+
+    }
+
+    public static void loseLife(Terminal terminal) throws Exception {
+        lifeCounter--;
+
+        if (lifeCounter == 0) {
+
+            terminal.setCursorPosition(34, 12);
+            String message = "* GAME OVER *";
+            for (int i = 0; i < message.length(); i++) {
+
+                terminal.putCharacter(message.charAt(i));
+            }
+            terminal.setCursorPosition(31, 14);
+            String messageAgain = "* PLAY AGAIN? Y/N *";
+            for (int i = 0; i < messageAgain.length(); i++) {
+
+                terminal.putCharacter(messageAgain.charAt(i));
+            }
+
+            updateMenu(terminal);
+            terminal.flush();
+            terminal.readInput();
+        }
+
     }
 }
-
 class Position {
     public int x;
     public int y;
