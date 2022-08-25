@@ -164,8 +164,9 @@ public class Snake {
 
     private static void updateMenu(Terminal terminal) throws IOException {
         terminal.setCursorPosition(25, 1);
+        char heart = '\u2665';
 
-        String message = "* SNAKE Level 1 Food " + (foodCounter-1) + " Lives 3 *";
+        String message = "* SNAKE Lives " + heart + heart + " Food " + (foodCounter-1) + " *";
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
