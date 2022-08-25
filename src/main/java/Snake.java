@@ -22,6 +22,13 @@ public class Snake {
     static int lifeCounter = 3;
 
     public static void main(String[] args) throws Exception {
+        startGame();
+    }
+    public static void startGame() throws Exception {
+        foodCounter = 1;
+        lifeCounter = 3;
+        play = true;
+        oldMoves.clear();
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
@@ -82,7 +89,6 @@ public class Snake {
             latestKeyStroke = keyStroke;
         }
     }
-
     private static void playGame(Position player, KeyStroke keyStroke, Terminal terminal) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
@@ -226,7 +232,10 @@ public class Snake {
                 KeyStroke keyStroke = terminal.readInput();
                 Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
                 if (c == Character.valueOf('y')) {
-
+                    terminal.close();
+                    play = false;
+                    startGame();
+                    break;
                 } else if (c == Character.valueOf('n')) {
                     terminal.close();
                     play = false;
