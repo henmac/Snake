@@ -29,16 +29,16 @@ public class Snake {
 
         updateMenu(terminal);
 
-        Position playerPos = new Position(20, 25);
+        Position playerPos = new Position(30, 20);
         terminal.setCursorPosition(playerPos.x, playerPos.y);
         terminal.putCharacter(actorSnake);
 
 
-        Position foodPos = new Position(15, 15);
+        Position foodPos = new Position(25, 15);
         terminal.setCursorPosition(foodPos.getX(), foodPos.getY());
         terminal.putCharacter(actorFood);
 
-        Position poisonPos = new Position(13, 13);
+        Position poisonPos = new Position(55, 10);
         terminal.setCursorPosition(poisonPos.x, poisonPos.y);
         terminal.putCharacter(actorPoison);
 
@@ -94,15 +94,15 @@ public class Snake {
             case ArrowRight -> player.x += 1;
             case ArrowLeft -> player.x -= 1;
         }
-        if (player.x > 79) {
-            player.x = 0;
-        } else if (player.x < 0) {
-            player.x = 79;
+        if (player.x > 59) {
+            player.x = 20;
+        } else if (player.x < 20) {
+            player.x = 59;
         }
-        if (player.y > 24) {
-            player.y = 3;
-        } else if (player.y < 3) {
-            player.y = 24;
+        if (player.y > 22) {
+            player.y = 4;
+        } else if (player.y < 4) {
+            player.y = 22;
         }
         terminal.setCursorPosition(player.x, player.y);
         terminal.putCharacter(actorSnake);
@@ -130,8 +130,8 @@ public class Snake {
         // check if player runs into the food
 
         if (foodPos.x == player.x && foodPos.y == player.y) {
-            foodPos.x = (r.nextInt(79));
-            foodPos.y = (r.nextInt(3, 24));
+            foodPos.x = (r.nextInt(21,59));
+            foodPos.y = (r.nextInt(4, 22));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(actorFood);
             terminal.flush();
@@ -146,8 +146,8 @@ public class Snake {
         //generate poison after every 4th food
         if (foodCounter % everyFourth == 0) {
             for (int i = 0; i < 2; i++) {
-                poison.x = (r.nextInt(79));
-                poison.y = (r.nextInt(2, 24));
+                poison.x = (r.nextInt(21, 59));
+                poison.y = (r.nextInt(4, 22));
                 terminal.setCursorPosition(poison.x, poison.y);
                 terminal.putCharacter(actorPoison);
             }
@@ -156,8 +156,8 @@ public class Snake {
 //lost of life and generation of a new poison after eating one
         if (poison.x == player.x && poison.y == player.y) {
             loseLife(terminal);
-            poison.x = (r.nextInt(79));
-            poison.y = (r.nextInt(2, 24));
+            poison.x = (r.nextInt(21,59));
+            poison.y = (r.nextInt(4, 22));
             terminal.setCursorPosition(poison.x, poison.y);
             terminal.putCharacter(actorPoison);
         }
@@ -166,7 +166,7 @@ public class Snake {
     private static void updateMenu(Terminal terminal) throws IOException {
         terminal.setCursorPosition(28, 1);
 
-        String message = "* SNAKE Food " + (foodCounter - 1) + " Lives "+lifeCounter+ " *";
+        String message = "* SNAKE Food " + (foodCounter - 1) + " Lives " + lifeCounter + " *";
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
@@ -180,6 +180,23 @@ public class Snake {
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter('*');
+        }
+        terminal.setCursorPosition(20, 3);
+        for (int i = 0; i < 40; i++) {
+
+            terminal.putCharacter('\u2591');
+        }terminal.setCursorPosition(20, 24);
+        for (int i = 0; i < 40; i++) {
+
+            terminal.putCharacter('\u2591');
+        }
+        for (int i = 3; i < 25; i++) {
+            terminal.setCursorPosition(19, i);
+            terminal.putCharacter('\u2591');
+        }
+        for (int i = 3; i < 25; i++) {
+            terminal.setCursorPosition(60, i);
+            terminal.putCharacter('\u2591');
         }
 
     }
