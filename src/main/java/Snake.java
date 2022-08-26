@@ -181,20 +181,34 @@ public class Snake {
     }
 
     private static void updateMenu(Terminal terminal) throws IOException {
-        terminal.setCursorPosition(28, 1);
-
-        String message = "* SNAKE Food " + (foodCounter - 1) + " Lives " + lifeCounter + " *";
+        terminal.setCursorPosition(19, 1);
+        String message = "* Food " + (foodCounter - 1);
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
+
         }
-        terminal.setCursorPosition(28, 0);
-        for (int i = 0; i < message.length(); i++) {
+        terminal.setCursorPosition(36, 1);
+        String message2 = " SNAKE ";
+        for (int i = 0; i < message2.length(); i++) {
+
+            terminal.putCharacter(message2.charAt(i));
+
+        }
+        terminal.setCursorPosition(51, 1);
+        String message3 = " Lives " + lifeCounter + " * ";
+        for (int i = 0; i < message3.length(); i++) {
+
+            terminal.putCharacter(message3.charAt(i));
+
+        }
+        terminal.setCursorPosition(19, 0);
+        for (int i = 0; i < 42; i++) {
 
             terminal.putCharacter('*');
         }
-        terminal.setCursorPosition(28, 2);
-        for (int i = 0; i < message.length(); i++) {
+        terminal.setCursorPosition(19, 2);
+        for (int i = 0; i < 42; i++) {
 
             terminal.putCharacter('*');
         }
