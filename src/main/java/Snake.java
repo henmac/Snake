@@ -70,7 +70,7 @@ public class Snake {
                     }
                 }
                 foodMovement(terminal, playerPos, foodPos);
-                poison(playerPos, poisonPos, terminal);
+                poison(playerPos, poisonPos, terminal, foodPos);
                 Thread.sleep(3); // might throw InterruptedException
                 keyStroke = terminal.pollInput();
             } while (keyStroke == null);
@@ -131,12 +131,24 @@ public class Snake {
 
         terminal.flush();
     }
-    public static void foodMovement(Terminal terminal, Position player, Position foodPos) throws Exception {
-        // check if player runs into the food
+    public static void foodMovement(Terminal terminal, Position snake, Position foodPos) throws Exception {
+        // check if snake runs into the food
 
-        if (foodPos.x == player.x && foodPos.y == player.y) {
-            foodPos.x = (r.nextInt(21,59));
-            foodPos.y = (r.nextInt(4, 22));
+
+        if (foodPos.x == snake.x && foodPos.y == snake.y) {
+
+            boolean isTaken = true;
+            while (isTaken) {
+                foodPos.x = (r.nextInt(21, 59));
+                foodPos.y = (r.nextInt(4, 22));
+                for (Position poisonPos : allPoisonPos) {
+                    if (foodPos.x == poisonPos.x && foodPos.y == poisonPos.y) {
+                        continue;
+                    } else {
+                        isTaken = false;
+                    }
+                }
+            }
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(actorFood);
             terminal.flush();
@@ -144,14 +156,23 @@ public class Snake {
 
         }
     }
-    public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
-        //generate poison after every 2nd food
+    public static void poison(Position snake, Position poison, Terminal terminal, Position foodPos) throws Exception {
+        //check if position is not taken by food, generate poison after every 2nd food
         if (foodCounter % everySecond == 0) {
-            for (int i = 0; i < 2; i++) {
-                Position poisonPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
-                allPoisonPos.add(poisonPos);
 
-                poisonPos.putCharacter(actorPoison, terminal);
+            for (int i = 0; i < 2; i++) {
+
+                boolean isTaken = true;
+                while (isTaken) {
+                    Position poisonPos = new Position(r.nextInt(21, 59), r.nextInt(4, 22));
+                    if (foodPos.x == poisonPos.x && foodPos.y == poisonPos.y) {
+                        continue;
+                    } else {
+                        allPoisonPos.add(poisonPos);
+                        poisonPos.putCharacter(actorPoison, terminal);
+                        isTaken = false;
+                    }
+                }
             }
             everySecond += 2;
         }
@@ -160,18 +181,25 @@ public class Snake {
         Position addPoison = null;
 
         for (Position poisonBite : allPoisonPos) {
-            if (player.x == poisonBite.getX() && player.y == poisonBite.getY()) {
+            if (snake.x == poisonBite.getX() && snake.y == poisonBite.getY()) {
                 loseLife(terminal);
 
                 removePoison = poisonBite;
+                Position poisonPos1;
 
-                Position poisonPos1 = new Position(r.nextInt(21,59), r.nextInt(4,22));
-                addPoison = poisonPos1;
-
-                poisonPos1.putCharacter(actorPoison,terminal);
+                boolean isTaken = true;
+                while (isTaken) {
+                    poisonPos1 = new Position(r.nextInt(21,59), r.nextInt(4,22));
+                    if (foodPos.x == poisonPos1.x && foodPos.y == poisonPos1.y) {
+                        continue;
+                    } else {
+                        poisonPos1.putCharacter(actorPoison,terminal);
+                        addPoison = poisonPos1;
+                        isTaken = false;
+                    }
+                }
             }
         }
-
         if(removePoison != null) {
             allPoisonPos.add(addPoison);
         }
