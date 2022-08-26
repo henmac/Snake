@@ -20,7 +20,6 @@ public class Snake {
     static Random r = new Random();
     static int foodCounter = 1;
     static int everySecond = 2;
-
     static int lifeCounter = 3;
 
     public static void main(String[] args) throws Exception {
@@ -28,6 +27,8 @@ public class Snake {
     }
 
     public static void startGame() throws Exception {
+        foodCounter = 1;
+        lifeCounter = 3;
         play = true;
         oldMoves.clear();
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
