@@ -17,7 +17,6 @@ public class Snake {
     static final char actorFood = 'o';
     static final char actorSnake = '\u2588';
     static final char actorPoison = '\u2620';
-    //ev. radera
     static Random r = new Random();
     static int foodCounter = 1;
     static int everySecond = 2;
@@ -27,9 +26,8 @@ public class Snake {
     public static void main(String[] args) throws Exception {
         startGame();
     }
+
     public static void startGame() throws Exception {
-        foodCounter = 1;
-        lifeCounter = 3;
         play = true;
         oldMoves.clear();
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
@@ -40,18 +38,14 @@ public class Snake {
         updateMenu(terminal);
 
         Position playerPos = new Position(30, 20);
-        terminal.setCursorPosition(playerPos.x, playerPos.y);
-        terminal.putCharacter(actorSnake);
-
+        playerPos.putCharacter(actorSnake, terminal);
 
         Position foodPos = new Position(25, 15);
-        terminal.setCursorPosition(foodPos.getX(), foodPos.getY());
-        terminal.putCharacter(actorFood);
+        foodPos.putCharacter(actorFood, terminal);
 
         Position poisonPos = new Position(55, 10);
         allPoisonPos.add(poisonPos);
-        terminal.setCursorPosition(poisonPos.x, poisonPos.y);
-        terminal.putCharacter(actorPoison);
+        poisonPos.putCharacter(actorPoison, terminal);
 
         KeyStroke latestKeyStroke = null;
 
@@ -114,6 +108,7 @@ public class Snake {
         } else if (player.y < 4) {
             player.y = 22;
         }
+
         terminal.setCursorPosition(player.x, player.y);
         terminal.putCharacter(actorSnake);
 
@@ -149,18 +144,14 @@ public class Snake {
 
         }
     }
-
     public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
-
-
         //generate poison after every 4th food
         if (foodCounter % everySecond == 0) {
             for (int i = 0; i < 2; i++) {
                 Position poisonPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
                 allPoisonPos.add(poisonPos);
 
-                terminal.setCursorPosition(poisonPos.x, poisonPos.y);
-                terminal.putCharacter(actorPoison);
+                poisonPos.putCharacter(actorPoison, terminal);
             }
             everySecond += 2;
         }
@@ -169,7 +160,7 @@ public class Snake {
         Position addPoison = null;
 
         for (Position poisonBite : allPoisonPos) {
-            if (poisonBite != null && player.x == poisonBite.getX() && player.y == poisonBite.getY()) {
+            if (player.x == poisonBite.getX() && player.y == poisonBite.getY()) {
                 loseLife(terminal);
                 terminal.bell();
                 removePoison = poisonBite;
@@ -177,8 +168,7 @@ public class Snake {
                 Position poisonPos1 = new Position(r.nextInt(21,59), r.nextInt(4,22));
                 addPoison = poisonPos1;
 
-                terminal.setCursorPosition(poisonPos1.x, poisonPos1.y);
-                terminal.putCharacter(actorPoison);
+                poisonPos1.putCharacter(actorPoison,terminal);
             }
         }
 
@@ -295,5 +285,10 @@ class Position {
 
     public int getY() {
         return y;
+    }
+
+    public void putCharacter(char actor, Terminal terminal) throws Exception {
+        terminal.setCursorPosition(x, y);
+        terminal.putCharacter(actor);
     }
 }
