@@ -37,13 +37,13 @@ public class Snake {
 
         updateMenu(terminal);
 
-        Position playerPos = new Position(30, 20);
+        Position playerPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
         playerPos.putCharacter(actorSnake, terminal);
 
-        Position foodPos = new Position(25, 15);
+        Position foodPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
         foodPos.putCharacter(actorFood, terminal);
 
-        Position poisonPos = new Position(55, 10);
+        Position poisonPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
         allPoisonPos.add(poisonPos);
         poisonPos.putCharacter(actorPoison, terminal);
 
