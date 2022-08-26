@@ -29,6 +29,7 @@ public class Snake {
 
     public static void startGame() throws Exception {
         foodCounter = 1;
+        everySecond = 2;
         lifeCounter = 3;
         play = true;
         oldMoves.clear();
