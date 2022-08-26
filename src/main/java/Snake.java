@@ -28,6 +28,7 @@ public class Snake {
 
     public static void startGame() throws Exception {
         foodCounter = 1;
+        everySecond = 2;
         lifeCounter = 3;
         play = true;
         oldMoves.clear();
@@ -187,8 +188,8 @@ public class Snake {
             terminal.putCharacter(message.charAt(i));
 
         }
-        terminal.setCursorPosition(36, 1);
-        String message2 = " SNAKE ";
+        terminal.setCursorPosition(32, 1);
+        String message2 = " Daggmasken 3310 ";
         for (int i = 0; i < message2.length(); i++) {
 
             terminal.putCharacter(message2.charAt(i));
