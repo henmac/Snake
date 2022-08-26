@@ -144,7 +144,7 @@ public class Snake {
         }
     }
     public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
-        //generate poison after every 4th food
+        //generate poison after every 2nd food
         if (foodCounter % everySecond == 0) {
             for (int i = 0; i < 2; i++) {
                 Position poisonPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
