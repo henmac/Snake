@@ -31,6 +31,7 @@ public class Snake {
         lifeCounter = 3;
         play = true;
         oldMoves.clear();
+        allPoisonPos.clear();
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
@@ -56,10 +57,7 @@ public class Snake {
             int foodCountIndex;
             int gameSpeed = 150;
             for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
-                gameSpeed-= (gameSpeed/10);
-                if (gameSpeed <= 0) {
-                    gameSpeed = 1;
-                }
+                gameSpeed -= (gameSpeed/10);
             }
             KeyStroke keyStroke = null;
             do {
@@ -163,7 +161,7 @@ public class Snake {
         for (Position poisonBite : allPoisonPos) {
             if (player.x == poisonBite.getX() && player.y == poisonBite.getY()) {
                 loseLife(terminal);
-                terminal.bell();
+
                 removePoison = poisonBite;
 
                 Position poisonPos1 = new Position(r.nextInt(21,59), r.nextInt(4,22));
