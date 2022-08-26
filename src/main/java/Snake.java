@@ -12,6 +12,8 @@ public class Snake {
 
     static List<Position> oldMoves = new ArrayList<>();
     static List<Position> allPoisonPos = new ArrayList<>();
+    static boolean play = true;
+
     static final char actorFood = 'o';
     static final char actorSnake = '\u2588';
     static final char actorPoison = '\u2620';
@@ -20,7 +22,16 @@ public class Snake {
     static int foodCounter = 1;
     static int everySecond = 2;
 
+    static int lifeCounter = 3;
+
     public static void main(String[] args) throws Exception {
+        startGame();
+    }
+    public static void startGame() throws Exception {
+        foodCounter = 1;
+        lifeCounter = 3;
+        play = true;
+        oldMoves.clear();
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
@@ -28,29 +39,27 @@ public class Snake {
 
         updateMenu(terminal);
 
-        Position playerPos = new Position(20,25);
+        Position playerPos = new Position(30, 20);
         terminal.setCursorPosition(playerPos.x, playerPos.y);
         terminal.putCharacter(actorSnake);
 
 
-        Position foodPos = new Position(15,15);
+        Position foodPos = new Position(25, 15);
         terminal.setCursorPosition(foodPos.getX(), foodPos.getY());
         terminal.putCharacter(actorFood);
 
-        Position poisonPos = new Position(13,13);
+        Position poisonPos = new Position(55, 10);
         allPoisonPos.add(poisonPos);
         terminal.setCursorPosition(poisonPos.x, poisonPos.y);
         terminal.putCharacter(actorPoison);
 
-
-
         KeyStroke latestKeyStroke = null;
 
-        while (true) {
+        while (play) {
 
             int index = 0;
             int foodCountIndex;
-            int gameSpeed = 200;
+            int gameSpeed = 150;
             for (foodCountIndex = 0; foodCountIndex < foodCounter; foodCountIndex++){
                 gameSpeed-= (gameSpeed/10);
                 if (gameSpeed <= 0) {
@@ -75,7 +84,7 @@ public class Snake {
             Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
             if (c == Character.valueOf('q')) {
                 terminal.close();
-                break;
+                play = false;
             } else if (c == Character.valueOf('p')) {
                 terminal.readInput();
                 continue;
@@ -84,8 +93,7 @@ public class Snake {
             latestKeyStroke = keyStroke;
         }
     }
-
-    private static void playGame (Position player, KeyStroke keyStroke, Terminal terminal) throws Exception {
+    private static void playGame(Position player, KeyStroke keyStroke, Terminal terminal) throws Exception {
         // Handle player
         Position oldPosition = new Position(player.x, player.y);
         oldMoves.add(oldPosition);
@@ -96,15 +104,15 @@ public class Snake {
             case ArrowRight -> player.x += 1;
             case ArrowLeft -> player.x -= 1;
         }
-        if (player.x > 40) {
-            player.x = 0;
-        } else if (player.x < 0) {
-            player.x = 40;
+        if (player.x > 59) {
+            player.x = 20;
+        } else if (player.x < 20) {
+            player.x = 59;
         }
-        if (player.y > 24) {
-            player.y = 3;
-        } else if (player.y < 3) {
-            player.y = 24;
+        if (player.y > 22) {
+            player.y = 4;
+        } else if (player.y < 4) {
+            player.y = 22;
         }
         terminal.setCursorPosition(player.x, player.y);
         terminal.putCharacter(actorSnake);
@@ -116,8 +124,7 @@ public class Snake {
 
         for (Position tail : oldMoves) {
             if (player.x == tail.getX() && player.y == tail.getY()) {
-                terminal.close();
-                break;
+                loseLife(terminal);
             }
         }
 
@@ -133,8 +140,8 @@ public class Snake {
         // check if player runs into the food
 
         if (foodPos.x == player.x && foodPos.y == player.y) {
-            foodPos.x = (r.nextInt(40));
-            foodPos.y = (r.nextInt(3, 24));
+            foodPos.x = (r.nextInt(21,59));
+            foodPos.y = (r.nextInt(4, 22));
             terminal.setCursorPosition(foodPos.x, foodPos.y);
             terminal.putCharacter(actorFood);
             terminal.flush();
@@ -144,13 +151,12 @@ public class Snake {
     }
 
     public static void poison(Position player, Position poison, Terminal terminal) throws Exception {
-        //remove
-        int lives = 3;
+
 
         //generate poison after every 4th food
         if (foodCounter % everySecond == 0) {
             for (int i = 0; i < 2; i++) {
-                Position poisonPos = new Position(r.nextInt(40), r.nextInt(2,24));
+                Position poisonPos = new Position(r.nextInt(21,59), r.nextInt(4,22));
                 allPoisonPos.add(poisonPos);
 
                 terminal.setCursorPosition(poisonPos.x, poisonPos.y);
@@ -164,11 +170,11 @@ public class Snake {
 
         for (Position poisonBite : allPoisonPos) {
             if (poisonBite != null && player.x == poisonBite.getX() && player.y == poisonBite.getY()) {
-                lives--;
+                loseLife(terminal);
                 terminal.bell();
                 removePoison = poisonBite;
 
-                Position poisonPos1 = new Position(r.nextInt(40), r.nextInt(2,24));
+                Position poisonPos1 = new Position(r.nextInt(21,59), r.nextInt(4,22));
                 addPoison = poisonPos1;
 
                 terminal.setCursorPosition(poisonPos1.x, poisonPos1.y);
@@ -185,26 +191,81 @@ public class Snake {
     }
 
     private static void updateMenu(Terminal terminal) throws IOException {
-        terminal.setCursorPosition(25, 1);
+        terminal.setCursorPosition(28, 1);
 
-        String message = "* SNAKE Level 1 Food " + (foodCounter-1) + " Lives 3 *";
+        String message = "* SNAKE Food " + (foodCounter - 1) + " Lives " + lifeCounter + " *";
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter(message.charAt(i));
         }
-        terminal.setCursorPosition(25, 0);
+        terminal.setCursorPosition(28, 0);
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter('*');
         }
-        terminal.setCursorPosition(25, 2);
+        terminal.setCursorPosition(28, 2);
         for (int i = 0; i < message.length(); i++) {
 
             terminal.putCharacter('*');
+        }
+        terminal.setCursorPosition(20, 3);
+        for (int i = 0; i < 40; i++) {
+
+            terminal.putCharacter('\u2591');
+        }terminal.setCursorPosition(20, 24);
+        for (int i = 0; i < 40; i++) {
+
+            terminal.putCharacter('\u2591');
+        }
+        for (int i = 3; i < 25; i++) {
+            terminal.setCursorPosition(19, i);
+            terminal.putCharacter('\u2591');
+        }
+        for (int i = 3; i < 25; i++) {
+            terminal.setCursorPosition(60, i);
+            terminal.putCharacter('\u2591');
+        }
+
+    }
+
+    public static void loseLife(Terminal terminal) throws Exception {
+        lifeCounter--;
+        terminal.bell();
+
+        if (lifeCounter == 0) {
+
+            terminal.setCursorPosition(34, 12);
+            String message = "* GAME OVER *";
+            for (int i = 0; i < message.length(); i++) {
+
+                terminal.putCharacter(message.charAt(i));
+            }
+            terminal.setCursorPosition(31, 14);
+            String messageAgain = "* PLAY AGAIN? Y/N *";
+            for (int i = 0; i < messageAgain.length(); i++) {
+
+                terminal.putCharacter(messageAgain.charAt(i));
+            }
+
+            updateMenu(terminal);
+            terminal.flush();
+            while (true) {
+                KeyStroke keyStroke = terminal.readInput();
+                Character c = keyStroke.getCharacter(); // used Character instead of char because it might be null
+                if (c == Character.valueOf('y')) {
+                    terminal.close();
+                    play = false;
+                    startGame();
+                    break;
+                } else if (c == Character.valueOf('n')) {
+                    terminal.close();
+                    play = false;
+                    break;
+                }
+            }
         }
     }
 }
-
 class Position {
     public int x;
     public int y;
